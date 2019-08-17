@@ -28,10 +28,10 @@ setup(
         'Framework :: Django',
     ],
     install_requires=[
-        'django >= 1.4',
+        'django >= 1.7',
         'bunch >= 1.0',
-        'django-taggit >= 0.9',
+        'django-taggit >= 0.13',
         'django-taggit-templatetags >= 0.4',
         'oauth2',
-    ],    
+    ],
 )
