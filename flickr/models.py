@@ -776,12 +776,13 @@ class JsonCache(models.Model):
     added = models.DateTimeField(auto_now=True, auto_now_add=True)
 
 
-class PhotoDownload(models.Model):
+def upload_path(obj, filename):
+    dirbase = getattr(settings, 'FLICKR_DOWNLOAD_DIRBASE', 'flickr')
+    dirformat = getattr(settings, 'FLICKR_DOWNLOAD_DIRFORMAT', '%Y/%Y-%m')
+    return '/'.join([dirbase, str(obj.photo.date_posted.date().strftime(dirformat)), filename])
 
-    def upload_path(self, filename):
-        dirbase = getattr(settings, 'FLICKR_DOWNLOAD_DIRBASE', 'flickr')
-        dirformat = getattr(settings, 'FLICKR_DOWNLOAD_DIRFORMAT', '%Y/%Y-%m')
-        return '/'.join([dirbase, str(self.photo.date_posted.date().strftime(dirformat)), filename])
+
+class PhotoDownload(models.Model):
 
     photo = models.OneToOneField(Photo)
     url = models.URLField(max_length=255, null=True, blank=True)
