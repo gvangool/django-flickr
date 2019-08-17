@@ -25,7 +25,7 @@ class FlickrModelTests(TestCase):
         self.user = User.objects.create(username='test', email='test@example.com')
         self.user.set_password('test')
         self.user.save()
-        self.flickr_user = FlickrUser.objects.create(user=self.user)
+        self.flickr_user = FlickrUser.objects.create(user=self.user, tzoffset="+00:00")
         self.user2 = User.objects.create(username='test2', email='test2@example.com')
         self.user2.set_password('test2')
         self.user2.save()
@@ -57,7 +57,7 @@ class FlickrModelTests(TestCase):
         self.assertEqual(photo.ispublic, json_info['ispublic'])
         self.assertEqual(photo.isfriend, json_info['isfriend'])
         self.assertEqual(photo.isfamily, json_info['isfamily'])
-        self.assertEqual(photo.date_posted, datetime.fromtimestamp(int(json_info['dateupload'])).strftime('%Y-%m-%d %H:%M:%S'))
+        self.assertEqual(photo.date_posted, datetime.fromtimestamp(int(json_info['dateupload'])).strftime('%Y-%m-%d %H:%M:%S+00:00'))
 
         json_info = json_photos_extras['photos']['photo'][1]
         photo = Photo.objects.create_from_json(flickr_user=self.flickr_user, photo=json_info, exif=json_exif)
@@ -93,7 +93,7 @@ class FlickrModelTests(TestCase):
         self.assertEqual(photoset.server, json_set_info['photoset']['server'])
         self.assertEqual(photoset.farm, json_set_info['photoset']['farm'])
         self.assertEqual(photoset.secret, json_set_info['photoset']['secret'])
-        self.assertEqual(photoset.date_posted, datetime.fromtimestamp(int(json_set_info['photoset']['date_create'])).strftime('%Y-%m-%d %H:%M:%S'))
+        self.assertEqual(photoset.date_posted, datetime.fromtimestamp(int(json_set_info['photoset']['date_create'])).strftime('%Y-%m-%d %H:%M:%S+00:00'))
         photoset.photos.add(photo)
         self.assertEqual(photoset.photos.all().count(), 1)
 
@@ -162,8 +162,7 @@ class FlickrModelTests(TestCase):
     @override_settings(ROOT_URLCONF='flickr.urls')
     def test_views_index(self):
         json_info = json_photos_extras['photos']['photo'][0]
-        FlickrUser.objects.update_from_json(self.flickr_user.id, json_user)
-        flickr_user = FlickrUser.objects.get(flickr_id=json_user['person']['id'])
+        flickr_user = self.flickr_user
         photo = Photo.objects.create_from_json(flickr_user=flickr_user, photo=json_info, sizes=None, exif=json_exif)
 
         response = self.client.get(reverse('flickr_index'))
@@ -181,9 +180,8 @@ class FlickrModelTests(TestCase):
 
     @override_settings(ROOT_URLCONF='flickr.urls')
     def test_views_photo(self):
+        flickr_user = self.flickr_user
         json_info = json_photos_extras['photos']['photo'][0]
-        FlickrUser.objects.update_from_json(self.flickr_user.id, json_user)
-        flickr_user = FlickrUser.objects.get(flickr_id=json_user['person']['id'])
         photo = Photo.objects.create_from_json(flickr_user=flickr_user, photo=json_info, sizes=None, exif=json_exif)
 
         response = self.client.get(reverse('flickr_photo', kwargs={'flickr_id': photo.flickr_id}))
@@ -193,6 +191,7 @@ class FlickrModelTests(TestCase):
 
     @override_settings(ROOT_URLCONF='flickr.urls')
     def test_views_photoset(self):
+        flickr_user = self.flickr_user
         json_info = json_photos_extras['photos']['photo'][0]
         photo = Photo.objects.create_from_json(flickr_user=self.flickr_user, photo=json_info, sizes=json_sizes, exif=json_exif)
         photoset = PhotoSet.objects.create_from_json(flickr_user=self.flickr_user, info=json_set_info['photoset'], photos=json_set_photos)
