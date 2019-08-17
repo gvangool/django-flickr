@@ -2,9 +2,10 @@
 # encoding: utf-8
 from bunch import bunchify
 from datetime import datetime
+import unittest
+import django
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.template.base import TemplateDoesNotExist
 from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
@@ -170,11 +171,11 @@ class FlickrModelTests(TestCase):
         self.assertTrue("flickr/index.html" in [tmpl.name for tmpl in response.templates])
         self.assertTrue(photo.description in response.content)
 
+    @unittest.skipIf(django.VERSION < (1, 5), "Django 1.4 responds with TemplateDoesNotExist instead of 404")
     @override_settings(ROOT_URLCONF='flickr.urls')
     def test_views_photo_invalid(self):
-        with self.assertRaises(TemplateDoesNotExist) as exc_info:
-            self.client.get(reverse('flickr_photo', kwargs={'flickr_id': 99999}))
-        self.assertEquals(str(exc_info.exception), "404.html")
+        response = self.client.get(reverse('flickr_photo', kwargs={'flickr_id': 99999}))
+        self.assertEquals(response.status_code, 404)
         with self.assertRaises(ValueError) as exc_info:
             self.client.get(reverse('flickr_photo', kwargs={'flickr_id': "random"}))
 
