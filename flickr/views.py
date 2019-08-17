@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
 from django.utils import simplejson
-from django.views.generic.list_detail import object_list
+from django.views.generic import ListView
 from flickr.api import FlickrApi
 from flickr.models import FlickrUser, Photo, PhotoSet
 from flickr.shortcuts import get_token_for_user
@@ -82,16 +82,28 @@ def auth(request):
     return render_to_response("flickr/auth_ok.html", {'token': fs.token, }, context_instance=RequestContext(request))
 
 
-def index(request, user_id=1):
-    photos = Photo.objects.public()
-    photosets = PhotoSet.objects.all()
-    return object_list(request,
-        queryset=photos,
-        paginate_by=10,
-        extra_context={'photosets': photosets, },
-        template_object_name='photo',
-        template_name='flickr/index.html'
-        )
+class IndexView(ListView):
+    template_name = 'flickr/index.html'
+    paginate_by = 10
+    context_object_name = 'photo_list'
+
+    def get_queryset(self):
+        return Photo.objects.public()
+
+    def get_context_data(self, **kwargs):
+        context_data = super(IndexView, self).get_context_data(**kwargs)
+        context_data['photosets'] = PhotoSet.objects.all()
+        return context_data
+
+
+class PhotoSetView(IndexView):
+    def get_queryset(self):
+        return Photo.objects.public(photoset__flickr_id__in=[self.kwargs['flickr_id'],])
+
+    def get_context_data(self, **kwargs):
+        context_data = super(PhotoSetView, self).get_context_data(**kwargs)
+        context_data['photoset'] = get_object_or_404(PhotoSet, flickr_id=self.kwargs['flickr_id'])
+        return context_data
 
 
 def photo(request, flickr_id):
@@ -100,19 +112,6 @@ def photo(request, flickr_id):
     except Photo.DoesNotExist:
         photo = get_object_or_404(Photo, pk=flickr_id)
     return render_to_response("flickr/photo_page.html", {'photo': photo, }, context_instance=RequestContext(request))
-
-
-def photoset(request, flickr_id):
-    photoset = get_object_or_404(PhotoSet, flickr_id=flickr_id)
-    photos = Photo.objects.public(photoset__id__in=[photoset.id, ])
-    photosets = PhotoSet.objects.all()
-    return object_list(request,
-        queryset=photos,
-        paginate_by=10,
-        extra_context={'photoset': photoset, 'photosets': photosets, },
-        template_object_name='photo',
-        template_name='flickr/index.html'
-        )
 
 
 def method_call(request, method):

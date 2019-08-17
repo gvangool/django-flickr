@@ -160,9 +160,15 @@ class FlickrModelTests(TestCase):
 
     @override_settings(ROOT_URLCONF='flickr.urls')
     def test_views_index(self):
+        json_info = json_photos_extras['photos']['photo'][0]
+        FlickrUser.objects.update_from_json(self.flickr_user.id, json_user)
+        flickr_user = FlickrUser.objects.get(flickr_id=json_user['person']['id'])
+        photo = Photo.objects.create_from_json(flickr_user=flickr_user, photo=json_info, sizes=None, exif=json_exif)
+
         response = self.client.get(reverse('flickr_index'))
         self.assertEquals(response.status_code, 200)
         self.assertTrue("flickr/index.html" in [tmpl.name for tmpl in response.templates])
+        self.assertTrue(photo.description in response.content)
 
     @override_settings(ROOT_URLCONF='flickr.urls')
     def test_views_photo_invalid(self):
