@@ -4,8 +4,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template.context import RequestContext
+from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView
 from flickr.api import FlickrApi
 from flickr.models import FlickrUser, Photo, PhotoSet
@@ -34,7 +33,7 @@ def oauth(request):
             fs.perms = None
             fs.save()
             return HttpResponseRedirect(reverse('flickr_auth'))
-    return render_to_response("flickr/auth_ok.html", {'token': token, }, context_instance=RequestContext(request))
+    return render(request, "flickr/auth_ok.html", {'token': token, })
 
 
 @login_required
@@ -76,10 +75,10 @@ def auth(request):
                 token = fs.token
             except FlickrUser.DoesNotExist:
                 auth_url = api.auth_url(PERMS)
-                return render_to_response("flickr/auth.html", {'auth_url': auth_url, }, context_instance=RequestContext(request))
+                return render(request, "flickr/auth.html", {'auth_url': auth_url, })
     else:
         fs = FlickrUser.objects.get(user=request.user)
-    return render_to_response("flickr/auth_ok.html", {'token': fs.token, }, context_instance=RequestContext(request))
+    return render(request, "flickr/auth_ok.html", {'token': fs.token, })
 
 
 class IndexView(ListView):
@@ -111,7 +110,7 @@ def photo(request, flickr_id):
         photo = Photo.objects.get(flickr_id=flickr_id)
     except Photo.DoesNotExist:
         photo = get_object_or_404(Photo, pk=flickr_id)
-    return render_to_response("flickr/photo_page.html", {'photo': photo, }, context_instance=RequestContext(request))
+    return render(request, "flickr/photo_page.html", {'photo': photo, })
 
 
 def method_call(request, method):
