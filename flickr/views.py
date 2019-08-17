@@ -1,3 +1,4 @@
+import json
 from bunch import bunchify
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -5,7 +6,6 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template.context import RequestContext
-from django.utils import simplejson
 from django.views.generic import ListView
 from flickr.api import FlickrApi
 from flickr.models import FlickrUser, Photo, PhotoSet
@@ -122,4 +122,4 @@ def method_call(request, method):
     else:
         auth = False
     data = api.get(method, auth=auth, photo_id='6110054503')
-    return HttpResponse(simplejson.dumps(data))
+    return HttpResponse(json.dumps(data))

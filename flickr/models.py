@@ -108,7 +108,7 @@ class PhotoManager(models.Manager):
     allowed_sizes = ['Square', 'Thumbnail', 'Small', 'Medium 640', 'Large', 'Original', ]
 
     def visible(self, *args, **kwargs):
-        return self.get_query_set().filter(show=True).filter(*args, **kwargs)
+        return self.filter(show=True).filter(*args, **kwargs)
 
     def public(self, *args, **kwargs):
         return self.visible(ispublic=1, *args, **kwargs)
@@ -576,7 +576,7 @@ setattr(Photo, 'thumbnail', thumb)
 class PhotoSetManager(models.Manager):
 
     def visible(self, *args, **kwargs):
-        return self.get_query_set().filter(show=True).filter(*args, **kwargs)
+        return self.filter(show=True).filter(*args, **kwargs)
 
     def _add_photos(self, obj, photos):
         for photo in photos:
