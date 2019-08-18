@@ -635,7 +635,7 @@ class PhotoSet(FlickrModel):
     date_posted = models.DateTimeField(null=True, blank=True)
     date_updated = models.DateTimeField(null=True, blank=True)
 
-    photos = models.ManyToManyField(Photo, null=True, blank=True)
+    photos = models.ManyToManyField(Photo, blank=True)
 
     objects = PhotoSetManager()
 
@@ -744,7 +744,7 @@ class Collection(FlickrModel):
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
     icon = models.URLField(max_length=255, null=True, blank=True)
-    sets = models.ManyToManyField(PhotoSet, null=True)
+    sets = models.ManyToManyField(PhotoSet)
     date_created = models.DateTimeField(null=True, blank=True)
 
     objects = CollectionManager()
@@ -773,7 +773,7 @@ class JsonCache(models.Model):
     exif = models.TextField(null=True, blank=True)
     geo = models.TextField(null=True, blank=True)
     exception = models.TextField(null=True, blank=True)
-    added = models.DateTimeField(auto_now=True, auto_now_add=True)
+    added = models.DateTimeField(auto_now_add=True)
 
 
 def upload_path(obj, filename):
@@ -789,7 +789,7 @@ class PhotoDownload(models.Model):
     image_file = models.FileField(upload_to=upload_path, null=True, blank=True)
     size = models.CharField(max_length=11, choices=[(v['label'], k) for k, v in FLICKR_PHOTO_SIZES.iteritems()])
     errors = models.TextField(null=True, blank=True)
-    date_downloaded = models.DateTimeField(auto_now=True, auto_now_add=True)
+    date_downloaded = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
         return u'%s' % str(self.photo)
