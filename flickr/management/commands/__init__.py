@@ -38,7 +38,7 @@ class FlickrCommand(BaseCommand):
             raise CommandError, 'No FLICKR_SECRET in settings. %s' % self.help_text
         self.api = FlickrApi(self.FLICKR_KEY, self.FLICKR_SECRET)
 
-    def handle(self, *args, **options):
+    def handle(self, **options):
         self.verbosity = options.get('verbosity')
         user_id = options.get('user_id')
         try:

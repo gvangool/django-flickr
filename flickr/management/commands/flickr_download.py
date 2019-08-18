@@ -6,7 +6,6 @@ Download all files from Flickr to disk (the ones in our synced DB'
 from django.core.files.base import ContentFile
 from flickr.management.commands import FlickrCommand
 from flickr.models import Photo, PhotoDownload
-from optparse import make_option
 import os
 import time
 import urllib2
@@ -16,26 +15,54 @@ class Command(FlickrCommand):
 
     help_text = 'Django-Flickr\n\nRun "./manage.py flickr_download --help" for details, \nor rtfm at http://bitbucket.org/zalew/django-flickr/ \n\n'
 
-    option_list = FlickrCommand.option_list + (
-
-        make_option('--user', '-u', action='store', dest='user_id', default=1,
-            help='Sync for a particular user. Default is 1 (in most cases it\'s the admin and you\'re using it only for yourself).'),
-
-        make_option('--all', '-a', action='store_true', dest='all', default=False,
-            help='By default downloads only photos which have not been downloaded (default behavior). Use this option to (re)download all.'),
-
-        make_option('--public', '-p', action='store_true', dest='public', default=False,
-            help='Only public photos.'),
-
-        make_option('--size', '-s', action='store_true', dest='size', default=None,
-            help='Specify size for download (by default original for pro accounts and large for non-pro).'),
-
-        make_option('--reset', '-r', action='store_true', dest='reset', default=False,
-            help='Clear downloads db table. Does not affect your files.'),
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--user',
+            '-u',
+            action='store',
+            dest='user_id',
+            default=1,
+            help='Sync for a particular user. Default is 1 (in most cases it\'s the admin and you\'re using it only for yourself).',
         )
 
-    def handle(self, *args, **options):
-        super(Command, self).handle(*args, **options)
+        parser.add_argument(
+            '--all',
+            '-a',
+            action='store_true',
+            dest='all',
+            default=False,
+            help='By default downloads only photos which have not been downloaded (default behavior). Use this option to (re)download all.',
+        )
+
+        parser.add_argument(
+            '--public',
+            '-p',
+            action='store_true',
+            dest='public',
+            default=False,
+            help='Only public photos.',
+        )
+
+        parser.add_argument(
+            '--size',
+            '-s',
+            action='store_true',
+            dest='size',
+            default=None,
+            help='Specify size for download (by default original for pro accounts and large for non-pro).',
+        )
+
+        parser.add_argument(
+            '--reset',
+            '-r',
+            action='store_true',
+            dest='reset',
+            default=False,
+            help='Clear downloads db table. Does not affect your files.',
+        )
+
+    def handle(self, **options):
+        super(Command, self).handle(**options)
 
         t1 = time.time()
 

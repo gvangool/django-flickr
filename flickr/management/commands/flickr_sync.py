@@ -8,7 +8,6 @@ from flickr.models import FlickrUser, Photo, JsonCache, PhotoSet, Collection
 from flickr.shortcuts import get_all_photos, get_photosets_json, \
     get_photoset_photos_json, get_user_json, get_collections_tree_json, \
     get_photo_exif_json, get_photo_sizes_json, get_photo_info_json, get_photo_geo_json, ALL_EXTRAS
-from optparse import make_option
 import datetime
 import time
 
@@ -17,68 +16,154 @@ class Command(FlickrCommand):
 
     help_text = 'Django-Flickr\n\nRun "./manage.py flickr_sync --help" for details, \nor rtfm at http://bitbucket.org/zalew/django-flickr/ \n\n'
 
-    option_list = FlickrCommand.option_list + (
-
-        make_option('--user', '-u', action='store', dest='user_id', default=1,
-            help='Sync for a particular user. Default is 1 (in most cases it\'s the admin and you\'re using it only for yourself).'),
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--user',
+            '-u',
+            action='store',
+            dest='user_id',
+            default=1,
+            help='Sync for a particular user. Default is 1 (in most cases it\'s the admin and you\'re using it only for yourself).',
+        )
 
         # Elements to sync
 
-        make_option('--info', '-i', action='store_true', dest='info', default=False,
-            help='Fetch info for photos. It will take a long time to sync as it needs to fetch Flickr data for every photo separately.'),
+        parser.add_argument(
+            '--info',
+            '-i',
+            action='store_true',
+            dest='info',
+            default=False,
+            help='Fetch info for photos. It will take a long time to sync as it needs to fetch Flickr data for every photo separately.',
+        )
 
-        make_option('--exif', '-e', action='store_true', dest='exif', default=False,
-            help='Fetch exif for photos. It will take a long time to sync as it needs to fetch Flickr data for every photo separately.'),
+        parser.add_argument(
+            '--exif',
+            '-e',
+            action='store_true',
+            dest='exif',
+            default=False,
+            help='Fetch exif for photos. It will take a long time to sync as it needs to fetch Flickr data for every photo separately.',
+        )
 
-        make_option('--sizes', '-s', action='store_true', dest='sizes', default=False,
+        parser.add_argument(
+            '--sizes',
+            '-s',
+            action='store_true',
+            dest='sizes',
+            default=False,
             help='Fetch sizes details for photos. It is not needed, sizes can be obtained dynanmically. \
-It will take a long time as it needs to fetch Flickr data for every photo separately. '),
+It will take a long time as it needs to fetch Flickr data for every photo separately. ',
+        )
 
-        make_option('--geo', '-g', action='store_true', dest='geo', default=False,
-            help='Fetch geo data for photos. It will take a long time as it needs to fetch Flickr data for every photo separately.'),
+        parser.add_argument(
+            '--geo',
+            '-g',
+            action='store_true',
+            dest='geo',
+            default=False,
+            help='Fetch geo data for photos. It will take a long time as it needs to fetch Flickr data for every photo separately.',
+        )
 
-        make_option('--photosets', '-p', action='store_true', dest='photosets', default=False,
-            help='Sync photosets. Photos must be synced first. If photo from photoset not in our db, it will be ommited.'),
+        parser.add_argument(
+            '--photosets',
+            '-p',
+            action='store_true',
+            dest='photosets',
+            default=False,
+            help='Sync photosets. Photos must be synced first. If photo from photoset not in our db, it will be ommited.',
+        )
 
-        make_option('--collections', '-c', action='store_true', dest='collections', default=False,
-            help='Sync collections. Photos and sets must be synced first.'),
+        parser.add_argument(
+            '--collections',
+            '-c',
+            action='store_true',
+            dest='collections',
+            default=False,
+            help='Sync collections. Photos and sets must be synced first.',
+        )
 
-        make_option('--no-photos', action='store_true', dest='no_photos', default=False,
-            help='Don\'t sync photos.'),
+        parser.add_argument(
+            '--no-photos',
+            action='store_true',
+            dest='no_photos',
+            default=False,
+            help='Don\'t sync photos.',
+        )
 
-        make_option('--update-photos', action='store_true', dest='update_photos', default=False,
-            help='Update outdated photos. It will take a long time as it needs to fetch Flickr several times per photo.'),
+        parser.add_argument(
+            '--update-photos',
+            action='store_true',
+            dest='update_photos',
+            default=False,
+            help='Update outdated photos. It will take a long time as it needs to fetch Flickr several times per photo.',
+        )
 
-        make_option('--update-tags', action='store_true', dest='update_tags', default=False,
-            help='Update tags in photos.'),
+        parser.add_argument(
+            '--update-tags',
+            action='store_true',
+            dest='update_tags',
+            default=False,
+            help='Update tags in photos.',
+        )
 
         # Range to sync
 
-        make_option('--days', '-d', action='store', dest='days', default=None,
-            help='Sync photos from the last n days.'),
+        parser.add_argument(
+            '--days',
+            '-d',
+            action='store',
+            dest='days',
+            default=None,
+            help='Sync photos from the last n days.',
+        )
 
-        make_option('--page', action='store', dest='page', default=None,
-            help='Grab a specific portion of photos. To be used with --per_page.'),
+        parser.add_argument(
+            '--page',
+            action='store',
+            dest='page',
+            default=None,
+            help='Grab a specific portion of photos. To be used with --per_page.',
+        )
 
-        make_option('--per-page', action='store', dest='per_page', default=20,
+        parser.add_argument(
+            '--per-page',
+            action='store',
+            dest='per_page',
+            default=20,
             help='How many photos per page should we grab? Set low value (10-50) for daily/weekly updates so there is less to parse,\n\
-set high value (200-500) for initial sync and big updates so we hit flickr less.'),
+set high value (200-500) for initial sync and big updates so we hit flickr less.',
+        )
 
-        make_option('--ils', action='store_true', dest='ils', default=False,
-            help='Ignore last_sync.'),
+        parser.add_argument(
+            '--ils',
+            action='store_true',
+            dest='ils',
+            default=False,
+            help='Ignore last_sync.',
+        )
 
         # Other
 
-        make_option('--initial', action='store_true', dest='initial', default=None,
-            help='It assumpts db flickr tables are empty and blindly hits create().'),
-
-        make_option('--test', '-t', action='store_true', dest='test', default=False,
-            help='Test/simulate. Don\'t write results to db.'),
-
+        parser.add_argument(
+            '--initial',
+            action='store_true',
+            dest='initial',
+            default=None,
+            help='It assumpts db flickr tables are empty and blindly hits create().',
         )
 
-    def handle(self, *args, **options):
-        super(Command, self).handle(*args, **options)
+        parser.add_argument(
+            '--test',
+            '-t',
+            action='store_true',
+            dest='test',
+            default=False,
+            help='Test/simulate. Don\'t write results to db.',
+        )
+
+    def handle(self, **options):
+        super(Command, self).handle(**options)
         t1 = time.time()
 
         """default behavior: sync pics and user info"""
