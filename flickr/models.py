@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 # encoding: utf-8
+from __future__ import print_function, unicode_literals
+
 from bunch import bunchify  # #for json.dot.notation instead of json['annoying']['dict']
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from taggit.managers import TaggableManager
 
@@ -35,6 +38,7 @@ class FlickrUserManager(models.Manager):
         return self.filter(pk=pk).update(**dict(user_data.items() + kwargs.items()))
 
 
+@python_2_unicode_compatible
 class FlickrUser(models.Model):
     user = models.OneToOneField(User)
     flickr_id = models.CharField(max_length=50, null=True, blank=True)
@@ -59,8 +63,8 @@ class FlickrUser(models.Model):
     class Meta:
         ordering = ["id"]
 
-    def __unicode__(self):
-        return u"%s" % self.username
+    def __str__(self):
+        return "%s" % self.username
 
     @property
     def flickr_page_url(self):
@@ -331,6 +335,7 @@ class PhotoManager(models.Manager):
         """Pretty self explanatory"""
 
 
+@python_2_unicode_compatible
 class Photo(FlickrModel):
 
     """http://www.flickr.com/services/api/explore/flickr.photos.getInfo"""
@@ -385,8 +390,8 @@ class Photo(FlickrModel):
         ordering = ("-date_posted", "-date_taken")
         get_latest_by = "date_posted"
 
-    def __unicode__(self):
-        return u"%s" % self.title
+    def __str__(self):
+        return "%s" % self.title
 
     def get_absolute_url(self):
         return reverse("flickr_photo", args=[self.flickr_id])
@@ -755,6 +760,7 @@ class PhotoSetManager(models.Manager):
         return obj
 
 
+@python_2_unicode_compatible
 class PhotoSet(FlickrModel):
     """http://www.flickr.com/services/api/explore/flickr.photosets.getInfo"""
 
@@ -779,8 +785,8 @@ class PhotoSet(FlickrModel):
         ordering = ("-date_posted", "-id")
         get_latest_by = "date_posted"
 
-    def __unicode__(self):
-        return u"%s" % self.title
+    def __str__(self):
+        return "%s" % self.title
 
     def get_absolute_url(self):
         return reverse("flickr_photoset", args=[self.flickr_id])
@@ -880,6 +886,7 @@ class CollectionManager(models.Manager):
         return self.create_from_usertree_json(flickr_user, tree, update=True, **kwargs)
 
 
+@python_2_unicode_compatible
 class Collection(FlickrModel):
 
     parent = models.ForeignKey("self", null=True)
@@ -895,8 +902,8 @@ class Collection(FlickrModel):
         ordering = ("-date_created",)
         get_latest_by = "date_created"
 
-    def __unicode__(self):
-        return u"%s" % self.title
+    def __str__(self):
+        return "%s" % self.title
 
     @property
     def flickr_page_url(self):
@@ -930,6 +937,7 @@ def upload_path(obj, filename):
     )
 
 
+@python_2_unicode_compatible
 class PhotoDownload(models.Model):
 
     photo = models.OneToOneField(Photo)
@@ -942,5 +950,5 @@ class PhotoDownload(models.Model):
     errors = models.TextField(null=True, blank=True)
     date_downloaded = models.DateTimeField(auto_now_add=True)
 
-    def __unicode__(self):
-        return u"%s" % str(self.photo)
+    def __str__(self):
+        return "%s" % str(self.photo)

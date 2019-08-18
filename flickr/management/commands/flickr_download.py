@@ -3,6 +3,8 @@
 """
 Download all files from Flickr to disk (the ones in our synced DB'
 """
+from __future__ import unicode_literals
+
 import os
 import time
 import urllib2

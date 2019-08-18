@@ -3,6 +3,8 @@
 
 """because I was too lazy to copy every url from their api explorer, and replace the secrets, etc. will work on it later"""
 
+from __future__ import unicode_literals
+
 json_photos = {
     "photos": {
         "page": 1,

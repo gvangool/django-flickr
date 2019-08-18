@@ -11,6 +11,8 @@ References:
  * http://www.flickr.com/services/api/misc.urls.html
 """
 
+from __future__ import unicode_literals
+
 FLICKR_PHOTO_SOURCE = "http://farm%(farm-id)s.staticflickr.com/%(server-id)s/%(photo-id)s_%(secret)s%(size_suffix)s.%(format)s%(append)s"
 FLICKR_PHOTO_URL_PAGE = "http://www.flickr.com/photos/%(user-id)s/%(photo-id)s/"
 FLICKR_PHOTO_URL_PAGE_SIZES = (
