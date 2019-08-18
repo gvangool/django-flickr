@@ -47,9 +47,11 @@ Contributors
 
 * `Jakub Zalewski`_
 * `Javier García Sogo`_
+* `Gert Van Gool`_
 
 .. _`Jakub Zalewski`: http://zalew.net
 .. _`Javier García Sogo`: https://bitbucket.org/jgsogo/
+.. _`Gert Van Gool`: https://www.gertvangool.be
 
 
 Bugs

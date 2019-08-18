@@ -25,6 +25,7 @@ Every model (except FlickrUser) is based on FlickrModel
 
 
 Every object belongs to a FlickrUser which is mapped to a Django User
+(``django.contrib.auth.models.User``, not swappable for now)
 
 .. code-block:: python
 
@@ -156,4 +157,3 @@ Collection
    c.parent # if collection is nested
    c.sets.all() # sets in this collection
    c.icon # the collage picture you see on Flickr
-

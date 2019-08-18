@@ -88,4 +88,3 @@ Photos are downloaded under your MEDIA folder. Default settings you can override
    FLICKR_DOWNLOAD_DIRBASE = 'downloads'
    FLICKR_DOWNLOAD_DIRFORMAT = '%Y/%m/%d'
    # photos with date_posted 23 January 2009 will land in /media/downloads/2009/01/23/ etc.
-

@@ -49,7 +49,7 @@ copyright = u'2012, Jakub Zalewski'
 #
 # The short X.Y version.
 
-version = '0.3.0'
+version = '0.5.0'
 # The full version, including alpha/beta/rc tags.
 release = version
 

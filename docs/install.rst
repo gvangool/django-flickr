@@ -31,7 +31,7 @@ From source
 Dependencies
 ------------
 
-* `Django`_ 1.4
+* `Django`_ 1.7 - 1.8 (for Django 1.4 - 1.6 use django-flickr 0.4.0)
 * `Bunch`_ - to ease up managing json data
 * `Taggit`_ - for handling tags
 * `Taggit-templatetags`_ - not obligatory really, but it's an awesome addition to taggit and the example view uses it
@@ -59,20 +59,16 @@ Go to 'Your apps' on Flickr and generate an API key for your app. Put those data
 and add flickr.urls to your urls.py
 
 
-
 Authenticate your Flickr account
 ---------------------------------
 
-Run your django app, sign in. Go to /flickr/auth/ and click on the link. Authorize your app on flickr. If your app is public, you'll be redirected to complete the auth process, if not (f.ex. you set up some bogus link), just copy the GET frob variables to your /flickr/auth url. Currently it uses FlickrAuth (set to be deprecated some day probably), not Oauth. (Oauth support is implemented, but untested well. You can try it.)
-
-http://blog.flickr.net/en/2012/01/13/start-the-new-year-fresh/
-
-  The Flickr API fully supports oAuth, which is already used by hundreds of Flickr apps, but there are still some apps that use the old authentication system, called FlickrAuth. We are asking all developers to move over to the new standard bu July 31. There is a related blog post on this topic on our engineering blog code.flickr.com.
+Run your django app, sign in. Go to /flickr/auth/ and click on the link. Authorize your app on flickr. If your app is public, you'll be redirected to complete the auth process, if not (f.ex. you set up some bogus link), just copy the GET variables to your /flickr/auth url.
 
 
 Upgrading
 ----------
+- Until django-flickr 0.4.0, `South
+<http://south.readthedocs.org/en/latest/index.html>`_ was used for migrations.
+- django-flickr 0.5.0 switched to django migrations.
 
-`South
-<http://south.readthedocs.org/en/latest/index.html>`_ is used for migrations. Project is in early stages so expect them.
-
+Project is in early stages so expect them.
