@@ -18,4 +18,4 @@ test-py27:
   image: python:2.7
   stage: test
   script:
-    - tox -e $(tox -ls | grep py27 | sed -e 'N;s/\n/,/')
+    - tox -e $(tox -ls | grep py27 | sed ':1;N;s/\n/,/;t1')
