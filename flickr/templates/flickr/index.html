@@ -1,5 +1,4 @@
 {% load flickr_tags %}
-{% load taggit_extras %}
 
 <h1>Django-Flickr (Demo Page)</h1>
 
@@ -36,13 +35,3 @@
 	{% endif %}
 	{% endfor %}
 	</ul>
-	
-<h2>Tags</h2>
-	
-	{% get_taglist as tags for 'flickr' %}
-	<ul class="tags">
-	{% for tag in tags %}
-		<li>#{{tag}} ({{tag.num_times}})</li>
-	{% endfor %}
-	</ul>
-

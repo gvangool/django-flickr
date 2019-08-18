@@ -39,7 +39,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'flickr',
     'taggit',
-    'taggit_templatetags',
 )
 
 MIDDLEWARE_CLASSES = (
