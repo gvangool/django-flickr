@@ -76,7 +76,3 @@ Upgrading
 `South
 <http://south.readthedocs.org/en/latest/index.html>`_ is used for migrations. Project is in early stages so expect them.
 
-
-
-
-

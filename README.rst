@@ -1,4 +1,4 @@
-Django-Flickr 
+Django-Flickr
 =============
 
 .. image:: https://pypip.in/v/django-flickr/badge.png
@@ -8,7 +8,7 @@ Django-Flickr
 .. image:: https://pypip.in/d/django-flickr/badge.png
     :target: https://crate.io/packages/django-flickr/
     :alt: Number of PyPI downloads
-    
+
 `Django-Flickr
 <https://bitbucket.org/zalew/django-flickr/>`_ provides a mechanism to mirror user's Flickr photos
 into a Django project.
@@ -31,5 +31,3 @@ Project links
 * roadmap, release log: https://bitbucket.org/zalew/django-flickr/wiki
 * license: BSD, see LICENSE file
 * contributors: see AUTHORS file
-
-

@@ -9,7 +9,7 @@ Sync photos database
 
 ::
 
-./manage.py flickr_sync [options]
+  ./manage.py flickr_sync [options]
 
 ::
 
@@ -58,7 +58,7 @@ Download photos
 
 ::
 
-./manage.py flickr_download [options]
+  ./manage.py flickr_download [options]
 
 ::
 

@@ -45,7 +45,7 @@ Selecting photos
 ~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
-   
+
    # all photos
    Photo.objects.all()
 
@@ -96,7 +96,7 @@ data in the database (if ``--sizes`` option was used) or dynamically generated
 so this will always return a valid url for all **web sizes** (see `issue #20 <https://bitbucket.org/zalew/django-flickr/issue/20/photo-unavailable-hotlinks-for-certain>`_).
 
 .. code-block:: python
-   
+
    p = Photo.objects.get(id=123)
    p.large.source           # Image source url for large size.
    p.square.source          # source url for square image (75x75)...
@@ -106,7 +106,7 @@ so this will always return a valid url for all **web sizes** (see `issue #20 <ht
 option while syncing and **original** will only be available for flickr pro accounts.
 
 .. code-block:: python
-   
+
    p.ori.url                # Url to web page for ori image.
    p.large2048.url          # Url to web page for ori image.
 
@@ -115,7 +115,7 @@ Photo **width** and **height** will only be available if ``flickr_sync`` was cal
 with the ``--sizes`` option.
 
 .. code-block:: python
-   
+
    p.ori.height             # Height of the original photo
    p.medium640.width        # Width for medium 640 size.
 
@@ -125,7 +125,7 @@ Some useful features
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
-   
+
    p = Photo.objects.get(id=123)
    p.get_next() # next photo in order like on Flickr
    p.get_prev() # previous photo
@@ -139,7 +139,7 @@ Photoset
 
 
 .. code-block:: python
-   
+
    photoset = Photoset.objects.get(id=123)
    photo = Photo.objects.get(id=456)
    photo.get_next_in_photoset(photoset)
@@ -151,11 +151,9 @@ Collection
 ----------
 
 .. code-block:: python
-   
+
    c = Collection.objects.get(id=123)
    c.parent # if collection is nested
    c.sets.all() # sets in this collection
    c.icon # the collage picture you see on Flickr
-
-
 
