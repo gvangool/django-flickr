@@ -13,7 +13,6 @@ from flickr.views import (
 urlpatterns = [
     url(r"^auth/$", oauth, name="flickr_auth"),
     url(r"^auth/complete/$", oauth_access, name="flickr_complete"),
-    url(r"^auth/deprecated/$", auth, name="flickr_auth_deprecated"),
     url(r"^flickr-callback/$", auth, name="flickr_auth_callback"),
     url(r"^method/(?P<method>.*)/$", method_call, name="flickr_method"),
     url(r"^set/(?P<flickr_id>.*)/$", PhotoSetView.as_view(), name="flickr_photoset"),

@@ -59,23 +59,12 @@ def auth(request):
     api = FlickrAuthApi(FLICKR_KEY, FLICKR_SECRET)
     token = get_token_for_user(request.user)
     if not token:
-        frob = request.GET.get('frob', None)
-        if frob:
-            data = api.frob2token(frob)
-            if data:
-                fs, created = FlickrUser.objects.get_or_create(user=request.user)
-                token, perms = data.rsp.auth.token.text, data.rsp.auth.perms.text
-                fs.token, fs.nsid, fs.username, fs.full_name, fs.perms = token, data.rsp.auth.user.nsid, data.rsp.auth.user.username, data.rsp.auth.user.fullname, perms
-                fs.flickr_id = data.rsp.auth.user.nsid
-                fs.save()
-                return HttpResponseRedirect(reverse('flickr_auth_deprecated'))
-        else:
-            try:
-                fs = FlickrUser.objects.get(user=request.user)
-                token = fs.token
-            except FlickrUser.DoesNotExist:
-                auth_url = api.auth_url(PERMS)
-                return render(request, "flickr/auth.html", {'auth_url': auth_url, })
+        try:
+            fs = FlickrUser.objects.get(user=request.user)
+            token = fs.token
+        except FlickrUser.DoesNotExist:
+            auth_url = api.auth_url(PERMS)
+            return render(request, "flickr/auth.html", {'auth_url': auth_url, })
     else:
         fs = FlickrUser.objects.get(user=request.user)
     return render(request, "flickr/auth_ok.html", {'token': fs.token, })
