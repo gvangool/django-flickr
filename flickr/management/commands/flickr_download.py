@@ -3,12 +3,14 @@
 """
 Download all files from Flickr to disk (the ones in our synced DB'
 """
-from django.core.files.base import ContentFile
-from flickr.management.commands import FlickrCommand
-from flickr.models import Photo, PhotoDownload
 import os
 import time
 import urllib2
+
+from django.core.files.base import ContentFile
+
+from flickr.management.commands import FlickrCommand
+from flickr.models import Photo, PhotoDownload
 
 
 class Command(FlickrCommand):
@@ -17,48 +19,48 @@ class Command(FlickrCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '--user',
-            '-u',
-            action='store',
-            dest='user_id',
+            "--user",
+            "-u",
+            action="store",
+            dest="user_id",
             default=1,
-            help='Sync for a particular user. Default is 1 (in most cases it\'s the admin and you\'re using it only for yourself).',
+            help="Sync for a particular user. Default is 1 (in most cases it's the admin and you're using it only for yourself).",
         )
 
         parser.add_argument(
-            '--all',
-            '-a',
-            action='store_true',
-            dest='all',
+            "--all",
+            "-a",
+            action="store_true",
+            dest="all",
             default=False,
-            help='By default downloads only photos which have not been downloaded (default behavior). Use this option to (re)download all.',
+            help="By default downloads only photos which have not been downloaded (default behavior). Use this option to (re)download all.",
         )
 
         parser.add_argument(
-            '--public',
-            '-p',
-            action='store_true',
-            dest='public',
+            "--public",
+            "-p",
+            action="store_true",
+            dest="public",
             default=False,
-            help='Only public photos.',
+            help="Only public photos.",
         )
 
         parser.add_argument(
-            '--size',
-            '-s',
-            action='store_true',
-            dest='size',
+            "--size",
+            "-s",
+            action="store_true",
+            dest="size",
             default=None,
-            help='Specify size for download (by default original for pro accounts and large for non-pro).',
+            help="Specify size for download (by default original for pro accounts and large for non-pro).",
         )
 
         parser.add_argument(
-            '--reset',
-            '-r',
-            action='store_true',
-            dest='reset',
+            "--reset",
+            "-r",
+            action="store_true",
+            dest="reset",
             default=False,
-            help='Clear downloads db table. Does not affect your files.',
+            help="Clear downloads db table. Does not affect your files.",
         )
 
     def handle(self, **options):
@@ -66,33 +68,39 @@ class Command(FlickrCommand):
 
         t1 = time.time()
 
-        if options.get('reset'):
-            self.v('Deleting everything from PhotoDownload table (%d records).' % PhotoDownload.objects.count(), 0)
+        if options.get("reset"):
+            self.v(
+                "Deleting everything from PhotoDownload table (%d records)."
+                % PhotoDownload.objects.count(),
+                0,
+            )
             [d.delete() for d in PhotoDownload.objects.all()]
-            self.v('PhotoDownload table empty.', 0)
+            self.v("PhotoDownload table empty.", 0)
             return
 
-        if options.get('public'):
+        if options.get("public"):
             photos = Photo.objects.visible()
-            self.v('Downloading public photos', 0)
+            self.v("Downloading public photos", 0)
         else:
             photos = Photo.objects.all()
-            self.v('Downloading photos', 0)
-        if not options.get('all'):
-            photos = photos.exclude(id__in=[pd.photo.id for pd in PhotoDownload.objects.all()])
+            self.v("Downloading photos", 0)
+        if not options.get("all"):
+            photos = photos.exclude(
+                id__in=[pd.photo.id for pd in PhotoDownload.objects.all()]
+            )
         length = len(photos)
         i = err = 0
         for photo in photos:
             i += 1
-            message = '.' * i
-            size = options.get('size')
+            message = "." * i
+            size = options.get("size")
             if not size:
                 if self.flickr_user.ispro:
-                    size = 'ori'
+                    size = "ori"
                 else:
-                    size = 'large'
+                    size = "large"
             url = getattr(photo, size).source
-            if not options.get('all'):
+            if not options.get("all"):
                 dphoto = PhotoDownload.objects.create(photo=photo)
             else:
                 dphoto, cr = PhotoDownload.objects.get_or_create(photo=photo)
@@ -100,29 +108,40 @@ class Command(FlickrCommand):
             dphoto.size = size
             try:
                 response = urllib2.urlopen(url)
-                if response.headers['content-type'] in ['image/jpeg', 'image/jpg']:
+                if response.headers["content-type"] in ["image/jpeg", "image/jpg"]:
                     content = response.read()
-                    dphoto.image_file.save(os.path.basename(url), ContentFile(content), save=True)
-                    #message += ' OK'
+                    dphoto.image_file.save(
+                        os.path.basename(url), ContentFile(content), save=True
+                    )
+                    # message += ' OK'
                 else:
-                    if response.url == 'http://l.yimg.com/g/images/photo_unavailable.gif':  # getcode() returns status 200
-                        dphoto.errors = 'Size unavailable (' + url + ') ' + str(response.headers)
-                        #TODO: what to do? what size fallback to?
+                    if (
+                        response.url
+                        == "http://l.yimg.com/g/images/photo_unavailable.gif"
+                    ):  # getcode() returns status 200
+                        dphoto.errors = (
+                            "Size unavailable (" + url + ") " + str(response.headers)
+                        )
+                        # TODO: what to do? what size fallback to?
                     else:
-                        dphoto.errors = 'Content-type wrong. ' + str(response.headers)
-                        #message += ' FAIL. check error log in db records\n'
+                        dphoto.errors = "Content-type wrong. " + str(response.headers)
+                        # message += ' FAIL. check error log in db records\n'
 
             except Exception as e:
-                #message += str(e)
+                # message += str(e)
                 dphoto.errors = str(e)
-                #message += 'FAIL. check error log in db records\n'
+                # message += 'FAIL. check error log in db records\n'
             dphoto.save()
-            errors_message = ''
+            errors_message = ""
             if err > 0:
-                errors_message = '(%d errors) ' % err
-            message = '%d%% [%d/%d] %s' % (int(round(float(i) / length * 100)), i, length, errors_message) + message
+                errors_message = "(%d errors) " % err
+            message = (
+                "%d%% [%d/%d] %s"
+                % (int(round(float(i) / length * 100)), i, length, errors_message)
+                + message
+            )
             self.v(message, 1, True)
 
         t2 = time.time()
-        self.v('Exec time: ' + str(round(t2 - t1)), 1)
-        return 'Sync end'
+        self.v("Exec time: " + str(round(t2 - t1)), 1)
+        return "Sync end"
