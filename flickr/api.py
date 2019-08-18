@@ -23,7 +23,7 @@ class BaseFlickrApi(object):
     """One of those APIs that don't do much. Simple Flickr auth and calling methods.
     Flickr's API docs: http://www.flickr.com/services/api/"""
 
-    ENDPOINT = 'http://api.flickr.com/services/rest/'
+    ENDPOINT = 'https://api.flickr.com/services/rest/'
 
     def __init__(self, key, secret, token=None, fallback=True):
         self.FLICKR_KEY = key
@@ -97,9 +97,9 @@ class OAuthFlickrApi(BaseFlickrApi):
         return json.loads(data)
 
     """ Auth methods """
-    REQUEST_TOKEN_URL = 'http://www.flickr.com/services/oauth/request_token'
-    AUTHORIZATION_URL = 'http://www.flickr.com/services/oauth/authorize'
-    ACCESS_TOKEN_URL = 'http://www.flickr.com/services/oauth/access_token'
+    REQUEST_TOKEN_URL = 'https://www.flickr.com/services/oauth/request_token'
+    AUTHORIZATION_URL = 'https://www.flickr.com/services/oauth/authorize'
+    ACCESS_TOKEN_URL = 'https://www.flickr.com/services/oauth/access_token'
 
     def auth_url(self, request, perms='read', callback=None):
         """ Request token """
@@ -134,7 +134,7 @@ class OAuthFlickrApi(BaseFlickrApi):
 
 class FlickrAuthApi(BaseFlickrApi):
     """One of those APIs that don't do much. Simple Flickr auth and calling methods.
-    Flickr's API docs: http://www.flickr.com/services/api/"""
+    Flickr's API docs: https://www.flickr.com/services/api/"""
 
     """Regular API call methods"""
 
@@ -166,7 +166,7 @@ class FlickrAuthApi(BaseFlickrApi):
 
     def auth_url(self, perms='read'):
         auth_sig = hashlib.md5('%sapi_key%sperms%s' % (self.FLICKR_SECRET, self.FLICKR_KEY, perms)).hexdigest()
-        return 'http://flickr.com/services/auth/?api_key=%s&perms=%s&api_sig=%s' % (self.FLICKR_KEY, perms, auth_sig)
+        return 'https://flickr.com/services/auth/?api_key=%s&perms=%s&api_sig=%s' % (self.FLICKR_KEY, perms, auth_sig)
 
     def _parse_xml(self, url):
         xml = minidom.parse(urllib.urlopen(url))
