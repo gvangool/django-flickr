@@ -12,7 +12,7 @@ setup(
     author_email='zalew7@gmail.com',
     url='https://bitbucket.org/zalew/django-flickr',
     license='BSD license',
-    packages=find_packages(),
+    packages=find_packages(exclude=["example",]),
     zip_safe=False,
     package_data = {
         'flickr': [],
