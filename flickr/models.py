@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # encoding: utf-8
-from __future__ import print_function, unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
+import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -35,7 +36,9 @@ class FlickrUserManager(models.Manager):
             "tzoffset": person.timezone.offset,
             #'last_sync': now(),
         }
-        return self.filter(pk=pk).update(**dict(user_data.items() + kwargs.items()))
+        return self.filter(pk=pk).update(
+            **dict(list(user_data.items()) + list(kwargs.items()))
+        )
 
 
 @python_2_unicode_compatible
@@ -289,7 +292,7 @@ class PhotoManager(models.Manager):
             **kwargs
         )
         tags = photo_data.pop("tags")
-        obj = self.create(**dict(photo_data.items() + kwargs.items()))
+        obj = self.create(**dict(list(photo_data.items()) + list(kwargs.items())))
         self._add_tags(obj, tags)
         self._add_sizes(obj, photo, sizes)
         return obj
@@ -317,7 +320,7 @@ class PhotoManager(models.Manager):
         )
         tags = photo_data.pop("tags")
         result = self.filter(flickr_id=flickr_id).update(
-            **dict(photo_data.items() + kwargs.items())
+            **dict(list(photo_data.items()) + list(kwargs.items()))
         )
         if result == 1:
             obj = self.get(flickr_id=flickr_id)
@@ -521,13 +524,13 @@ class PhotoSizeDataManager(models.Manager):
     def create_from_json(self, photo, size, **kwargs):
         """Create a record for photo size data"""
         photosize_data = self._prepare_data(photo=photo, size=size, **kwargs)
-        obj = self.create(**dict(photosize_data.items() + kwargs.items()))
+        obj = self.create(**dict(list(photosize_data.items()) + list(kwargs.items())))
         return obj
 
     def update_from_json(self, photosize_id, size, **kwargs):
         photosize_data = self._prepare_data(size=size, **kwargs)
         result = self.filter(id=photosize_id).update(
-            **dict(photosize_data.items()) + kwargs.items()
+            **dict(list(photosize_data.items())) + list(kwargs.items())
         )
         return result
 
@@ -536,7 +539,7 @@ class PhotoSizeData(models.Model):
     photo = models.ForeignKey(Photo, related_name="sizes")
     size = models.CharField(
         max_length=11,
-        choices=[(v["label"], k) for k, v in FLICKR_PHOTO_SIZES.iteritems()],
+        choices=[(v["label"], k) for k, v in six.iteritems(FLICKR_PHOTO_SIZES)],
     )
     width = models.PositiveIntegerField(null=True, blank=True)
     height = models.PositiveIntegerField(null=True, blank=True)
@@ -578,7 +581,7 @@ class PhotoSize(object):
 
     def __init__(self, photo, **kwargs):
         self.photo = photo
-        for key, value in kwargs.iteritems():
+        for key, value in six.iteritems(kwargs):
             setattr(self, key, value)
 
         self.secret = getattr(self.photo, self.secret_field)
@@ -741,7 +744,7 @@ class PhotoSetManager(models.Manager):
         )
         photos = photoset_data.pop("photos")
         result = self.filter(flickr_id=flickr_id).update(
-            **dict(photoset_data.items() + kwargs.items())
+            **dict(list(photoset_data.items()) + list(kwargs.items()))
         )
         if result == 1 and update_photos:
             obj = self.get(flickr_id=flickr_id)
@@ -755,7 +758,7 @@ class PhotoSetManager(models.Manager):
             flickr_user=flickr_user, info=info, photos=photos, **kwargs
         )
         photos = photoset_data.pop("photos")
-        obj = self.create(**dict(photoset_data.items() + kwargs.items()))
+        obj = self.create(**dict(list(photoset_data.items()) + list(kwargs.items())))
         self._add_photos(obj, photos)
         return obj
 
@@ -829,31 +832,31 @@ class CollectionManager(models.Manager):
         }
         if flickr_user:
             data["user"] = flickr_user
-        if "date_create" in col.keys():
+        if "date_create" in list(col.keys()):
             data["date_created"] = ts_to_dt(col.date_create, flickr_user.tzoffset)
-        if "set" in col.keys():
+        if "set" in list(col.keys()):
             data["sets"] = col.set
-        if "collection" in col.keys():
+        if "collection" in list(col.keys()):
             data["collections"] = col.collection
         return data
 
     def create_obj(self, info, parent=None, flickr_user=None, **kwargs):
         data = self._prepare_data(info, parent=parent, flickr_user=flickr_user)
         sets_data = cols_data = None
-        if "sets" in data.keys():
+        if "sets" in list(data.keys()):
             sets_data = data.pop("sets")
-        if "collections" in data.keys():
+        if "collections" in list(data.keys()):
             cols_data = data.pop("collections")
         if kwargs.pop("update", False):
             obj = self.filter(flickr_id=data["flickr_id"]).update(
-                **dict(data.items() + kwargs.items())
+                **dict(list(data.items()) + list(kwargs.items()))
             )
             if obj:  # #filter().update() didn't return object
                 obj = self.get(flickr_id=data["flickr_id"])
             else:
-                obj = self.create(**dict(data.items() + kwargs.items()))
+                obj = self.create(**dict(list(data.items()) + list(kwargs.items())))
         else:
-            obj = self.create(**dict(data.items() + kwargs.items()))
+            obj = self.create(**dict(list(data.items()) + list(kwargs.items())))
         if sets_data:
             self._add_sets(obj, sets_data)
         return obj, cols_data
@@ -945,7 +948,7 @@ class PhotoDownload(models.Model):
     image_file = models.FileField(upload_to=upload_path, null=True, blank=True)
     size = models.CharField(
         max_length=11,
-        choices=[(v["label"], k) for k, v in FLICKR_PHOTO_SIZES.iteritems()],
+        choices=[(v["label"], k) for k, v in six.iteritems(FLICKR_PHOTO_SIZES)],
     )
     errors = models.TextField(null=True, blank=True)
     date_downloaded = models.DateTimeField(auto_now_add=True)

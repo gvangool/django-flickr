@@ -3,12 +3,14 @@
 """
 Download all files from Flickr to disk (the ones in our synced DB'
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import os
 import time
-import urllib2
 
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.core.files.base import ContentFile
 
 from flickr.management.commands import FlickrCommand
@@ -109,7 +111,7 @@ class Command(FlickrCommand):
             dphoto.url = url
             dphoto.size = size
             try:
-                response = urllib2.urlopen(url)
+                response = six.moves.urllib.request.urlopen(url)
                 if response.headers["content-type"] in ["image/jpeg", "image/jpg"]:
                     content = response.read()
                     dphoto.image_file.save(

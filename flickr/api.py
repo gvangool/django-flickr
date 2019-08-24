@@ -1,18 +1,20 @@
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import hashlib
 import json
-import urllib
-import urllib2
-from urllib2 import HTTPError
 from xml.dom import minidom
 
+import six
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from oauth2 import (
     Consumer as OAuthConsumer,
     Request as OAuthRequest,
     SignatureMethod_HMAC_SHA1,
     Token,
 )
+from six.moves.urllib.error import HTTPError
 
 
 class FlickrError(Exception):
@@ -88,7 +90,7 @@ class OAuthFlickrApi(BaseFlickrApi):
         return request
 
     def get_response(self, request):
-        response = urllib2.urlopen(request.to_url())
+        response = six.moves.urllib.request.urlopen(request.to_url())
         return "\n".join(response.readlines())
 
     def _call_method(self, auth, **params):
@@ -168,7 +170,10 @@ class FlickrAuthApi(BaseFlickrApi):
             params["nojsoncallback"] = 1
         if not params.get("method", "").startswith("flickr."):
             params["method"] = "flickr.%s" % params["method"]
-        url = "%s?%s" % (self.ENDPOINT, urllib.urlencode(sorted(params.items())))
+        url = "%s?%s" % (
+            self.ENDPOINT,
+            six.moves.urllib.parse.urlencode(sorted(params.items())),
+        )
         if auth:
             if not self.token:
                 raise FlickrError(
@@ -182,13 +187,13 @@ class FlickrAuthApi(BaseFlickrApi):
                     % (
                         self.FLICKR_SECRET,
                         "".join(
-                            sorted(["%s%s" % (k, v) for k, v in params.iteritems()])
+                            sorted(["%s%s" % (k, v) for k, v in six.iteritems(params)])
                         ),
                     )
                 ).hexdigest(),
             )
         try:
-            f = urllib.urlopen(url)
+            f = six.moves.urllib.request.urlopen(url)
         except Exception as e:
             raise FlickrError(
                 "Can't open url (%s), urllib.urlopen() failed with %s" % (url, e)
@@ -208,7 +213,7 @@ class FlickrAuthApi(BaseFlickrApi):
         )
 
     def _parse_xml(self, url):
-        xml = minidom.parse(urllib.urlopen(url))
+        xml = minidom.parse(six.moves.urllib.request.urlopen(url))
         data = unmarshal(xml)
         if not data.rsp.stat == "ok":
             msg = "ERROR [%s]: %s" % (data.rsp.err.code, data.rsp.err.msg)
