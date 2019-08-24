@@ -34,8 +34,8 @@ setup(
     python_requires='>=3.5',
     install_requires=[
         'django >= 1.11',
-        'munch >= 2.0',
+        'munch>=2.3.2',
         'django-taggit >= 0.13',
-        'oauth2',
+        'oauth2>=1.9.0.post1',
     ],
 )
