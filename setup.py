@@ -29,7 +29,7 @@ setup(
     ],
     install_requires=[
         'django >= 1.8,<2.0',
-        'bunch >= 1.0',
+        'munch >= 2.0',
         'django-taggit >= 0.13',
         'oauth2',
     ],

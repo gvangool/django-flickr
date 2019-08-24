@@ -2,13 +2,13 @@
 # encoding: utf-8
 from __future__ import print_function, unicode_literals
 
-from bunch import bunchify  # #for json.dot.notation instead of json['annoying']['dict']
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
+from munch import munchify  # #for json.dot.notation instead of json['annoying']['dict']
 from taggit.managers import TaggableManager
 
 from flickr.flickr_spec import FLICKR_PHOTO_SIZES, build_photo_source
@@ -19,7 +19,7 @@ URL_BASE = getattr(settings, "FLICKR_URL_BASE", "http://www.flickr.com/")
 
 class FlickrUserManager(models.Manager):
     def update_from_json(self, pk, info, **kwargs):
-        person = bunchify(info["person"])
+        person = munchify(info["person"])
         user_data = {
             "username": person.username._content,
             "realname": person.realname._content,
@@ -139,14 +139,14 @@ class PhotoManager(models.Manager):
         @params flickr_user: FlickrUser object for the given photo
         @return:    the dict with all photo data.
         """
-        photo_bunch = bunchify(photo)
+        photo_bunch = munchify(photo)
         photo_data = {}
         if info and exif and geo:
             """ Update last_sync only if all the info is retrieved from flickr """
             photo_data.update({"last_sync": now()})
         if info:
             """ With data returned from 'photos.getInfo' (no need of 'photo' dict)."""
-            info_bunch = bunchify(info["photo"])
+            info_bunch = munchify(info["photo"])
             photo_info = {
                 "flickr_id": info_bunch.id,
                 "server": info_bunch.server,
@@ -216,7 +216,7 @@ class PhotoManager(models.Manager):
             photo_data["exif"] = str(exif)
             try:
                 photo_data["exif_camera"] = exif["photo"]["camera"]
-                for e in bunchify(exif["photo"]["exif"]):
+                for e in munchify(exif["photo"]["exif"]):
                     if e.label == "Exposure":
                         photo_data["exif_exposure"] = unslash(e.raw._content)
                     if e.label == "Aperture":
@@ -506,7 +506,7 @@ class Photo(FlickrModel):
 
 class PhotoSizeDataManager(models.Manager):
     def _prepare_data(self, size, photo=None, **kwargs):
-        size_data = bunchify(size)
+        size_data = munchify(size)
         data = {
             "size": FLICKR_PHOTO_SIZES[size_data.label]["label"],
             "width": size_data.width,
@@ -712,8 +712,8 @@ class PhotoSetManager(models.Manager):
                 pass
 
     def _prepare_data(self, info, photos, flickr_user, exif=None, geo=None):
-        photoset = bunchify(info)
-        photos = bunchify(photos["photoset"]["photo"])
+        photoset = munchify(info)
+        photos = munchify(photos["photoset"]["photo"])
 
         data = {
             "flickr_id": photoset.id,
@@ -818,7 +818,7 @@ class CollectionManager(models.Manager):
         obj.sets.add(*[s.id for s in flickr_sets])
 
     def _prepare_data(self, info, flickr_user, parent=None):
-        col = bunchify(info)
+        col = munchify(info)
         data = {
             "flickr_id": col.id,
             "title": col.title,

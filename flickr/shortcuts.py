@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 
 import time
 
-from bunch import bunchify
 from django.conf import settings
+from munch import munchify
 
 from flickr.api import FlickrApi
 from flickr.models import FlickrUser
@@ -26,7 +26,7 @@ def get_photos_json(
     nsid, token, page=1, per_page=500, min_upload_date=None, extras=None
 ):
     api = FlickrApi(FLICKR_KEY, FLICKR_SECRET, token)
-    return bunchify(
+    return munchify(
         api.get(
             method="people.getPhotos",
             user_id=nsid,
@@ -96,29 +96,29 @@ def get_photo_geo_json(photo_id, token):
 
 def get_photosets_json(nsid, token):
     api = FlickrApi(FLICKR_KEY, FLICKR_SECRET, token)
-    return bunchify(
+    return munchify(
         api.get(method="flickr.photosets.getList", user_id=nsid, page=1, per_page=500)
     )
 
 
 def get_photoset_photos_json(photoset_id, token):
     api = FlickrApi(FLICKR_KEY, FLICKR_SECRET, token)
-    return bunchify(
+    return munchify(
         api.get(method="flickr.photosets.getPhotos", photoset_id=photoset_id)
     )
 
 
 def get_user_json(nsid, token):
     api = FlickrApi(FLICKR_KEY, FLICKR_SECRET, token)
-    return bunchify(api.get(method="flickr.people.getInfo", user_id=nsid))
+    return munchify(api.get(method="flickr.people.getInfo", user_id=nsid))
 
 
 def get_collections_tree_json(nsid, token):
     """tree for user or tree for collection"""
     api = FlickrApi(FLICKR_KEY, FLICKR_SECRET, token)
-    return bunchify(api.get(method="collections.getTree", user_id=nsid))
+    return munchify(api.get(method="collections.getTree", user_id=nsid))
 
 
 def get_collection_info_json(collection_id, token):
     api = FlickrApi(FLICKR_KEY, FLICKR_SECRET, token)
-    return bunchify(api.get(method="collections.getInfo", collection_id=collection_id))
+    return munchify(api.get(method="collections.getInfo", collection_id=collection_id))

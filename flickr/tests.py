@@ -6,12 +6,12 @@ import unittest
 from datetime import datetime
 
 import django
-from bunch import bunchify
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
+from munch import munchify
 
 from flickr.flickr_spec import FLICKR_PHOTO_SIZES
 from flickr.models import Collection, FlickrUser, Photo, PhotoSet
@@ -177,7 +177,7 @@ class FlickrModelTests(TestCase):
     def test_dynamic_sizes(self):
         json_info_photo = json_photos_extras["photos"]["photo"][0]
         json_info_data = json_info  # json_photos_extras['photos']['photo'][0]
-        tags = bunchify(json_info_photo)
+        tags = munchify(json_info_photo)
         tags = tags.tags
 
         FlickrUser.objects.update_from_json(self.flickr_user.id, json_user)
@@ -189,7 +189,7 @@ class FlickrModelTests(TestCase):
             sizes=None,
             exif=json_exif,
         )
-        size_bunch = bunchify(json_sizes["sizes"]["size"])
+        size_bunch = munchify(json_sizes["sizes"]["size"])
         for size in size_bunch:
             self.assertEqual(
                 unslash(size.source),
@@ -225,7 +225,7 @@ class FlickrModelTests(TestCase):
         )
         photo = Photo.objects.get(flickr_id=photo.flickr_id)
         with self.assertNumQueries(1):
-            size_bunch = bunchify(json_sizes["sizes"]["size"])
+            size_bunch = munchify(json_sizes["sizes"]["size"])
             for size in size_bunch:
                 self.assertEqual(
                     unslash(size.source),
@@ -244,7 +244,7 @@ class FlickrModelTests(TestCase):
         )
         photo = Photo.objects.get(flickr_id=photo.flickr_id)
         with self.assertNumQueries(1):
-            size_bunch = bunchify(json_sizes["sizes"]["size"])
+            size_bunch = munchify(json_sizes["sizes"]["size"])
             for size in size_bunch:
                 self.assertEqual(
                     unslash(size.source),

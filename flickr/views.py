@@ -2,13 +2,13 @@ from __future__ import unicode_literals
 
 import json
 
-from bunch import bunchify
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView
+from munch import munchify
 
 from flickr.api import FlickrApi
 from flickr.models import FlickrUser, Photo, PhotoSet
@@ -48,7 +48,7 @@ def oauth_access(request):
     api = FlickrApi(FLICKR_KEY, FLICKR_SECRET)
     data = api.access_token(request)
     if data:
-        data = bunchify(data)
+        data = munchify(data)
         fs, created = FlickrUser.objects.get_or_create(user=request.user)
         fs.token = data.token
         fs.nsid = data.oauth.user.nsid
