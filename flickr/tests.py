@@ -268,7 +268,7 @@ class FlickrModelTests(TestCase):
         self.assertTrue(
             "flickr/index.html" in [tmpl.name for tmpl in response.templates]
         )
-        self.assertTrue(photo.description in response.content)
+        self.assertTrue(photo.description.encode("utf-8") in response.content)
 
     @unittest.skipIf(
         django.VERSION < (1, 5),
@@ -296,7 +296,7 @@ class FlickrModelTests(TestCase):
         self.assertTrue(
             "flickr/photo_page.html" in [tmpl.name for tmpl in response.templates]
         )
-        self.assertTrue(photo.title in response.content)
+        self.assertTrue(photo.title.encode("utf-8") in response.content)
 
     @override_settings(ROOT_URLCONF="flickr.urls")
     def test_views_photoset(self):
@@ -321,8 +321,8 @@ class FlickrModelTests(TestCase):
         self.assertTrue(
             "flickr/index.html" in [tmpl.name for tmpl in response.templates]
         )
-        self.assertTrue(photoset.title in response.content)
-        self.assertTrue(photo.description in response.content)
+        self.assertTrue(photoset.title.encode("utf-8") in response.content)
+        self.assertTrue(photo.description.encode("utf-8") in response.content)
 
     def test_imports(self):
         import flickr.admin
