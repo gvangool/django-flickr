@@ -264,7 +264,7 @@ class FlickrModelTests(TestCase):
         )
 
         response = self.client.get(reverse("flickr_index"))
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue(
             "flickr/index.html" in [tmpl.name for tmpl in response.templates]
         )
@@ -277,7 +277,7 @@ class FlickrModelTests(TestCase):
     @override_settings(ROOT_URLCONF="flickr.urls")
     def test_views_photo_invalid(self):
         response = self.client.get(reverse("flickr_photo", kwargs={"flickr_id": 99999}))
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
         with self.assertRaises(ValueError) as exc_info:
             self.client.get(reverse("flickr_photo", kwargs={"flickr_id": "random"}))
 
@@ -292,7 +292,7 @@ class FlickrModelTests(TestCase):
         response = self.client.get(
             reverse("flickr_photo", kwargs={"flickr_id": photo.flickr_id})
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue(
             "flickr/photo_page.html" in [tmpl.name for tmpl in response.templates]
         )
@@ -317,7 +317,7 @@ class FlickrModelTests(TestCase):
         response = self.client.get(
             reverse("flickr_photoset", kwargs={"flickr_id": photoset.flickr_id})
         )
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertTrue(
             "flickr/index.html" in [tmpl.name for tmpl in response.templates]
         )
