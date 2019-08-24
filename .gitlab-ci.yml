@@ -1,6 +1,7 @@
 stages:
   - build
   - test
+  - qa
 
 before_script:
   - pip install tox
@@ -31,3 +32,15 @@ test-py37:
   stage: test
   script:
     - tox -e $(tox -ls | grep py37 | sed ':1;N;s/\n/,/;t1')
+
+black:
+  image: python:3.6
+  stage: qa
+  script:
+    - tox -e black
+
+isort:
+  image: python:3.6
+  stage: qa
+  script:
+    - tox -e isort
