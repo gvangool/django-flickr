@@ -1,13 +1,9 @@
 #!/usr/bin/env python
 # encoding: utf-8
-from __future__ import absolute_import, print_function, unicode_literals
-
-import six
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now
 from munch import munchify  # #for json.dot.notation instead of json['annoying']['dict']
 from taggit.managers import TaggableManager
@@ -41,7 +37,6 @@ class FlickrUserManager(models.Manager):
         )
 
 
-@python_2_unicode_compatible
 class FlickrUser(models.Model):
     user = models.OneToOneField(User)
     flickr_id = models.CharField(max_length=50, null=True, blank=True)
@@ -268,7 +263,7 @@ class PhotoManager(models.Manager):
             for size in sizes["sizes"]["size"]:
                 obj.sizes.create_from_json(photo=obj, size=size)
         else:
-            for key, size in FLICKR_PHOTO_SIZES.items():
+            for key, size in list(FLICKR_PHOTO_SIZES.items()):
                 url_suffix = size.get("url_suffix", None)
                 if url_suffix and getattr(photo, "url_%s" % url_suffix, None):
                     size_data = {
@@ -338,7 +333,6 @@ class PhotoManager(models.Manager):
         """Pretty self explanatory"""
 
 
-@python_2_unicode_compatible
 class Photo(FlickrModel):
 
     """http://www.flickr.com/services/api/explore/flickr.photos.getInfo"""
@@ -538,8 +532,7 @@ class PhotoSizeDataManager(models.Manager):
 class PhotoSizeData(models.Model):
     photo = models.ForeignKey(Photo, related_name="sizes")
     size = models.CharField(
-        max_length=11,
-        choices=[(v["label"], k) for k, v in six.iteritems(FLICKR_PHOTO_SIZES)],
+        max_length=11, choices=[(v["label"], k) for k, v in FLICKR_PHOTO_SIZES.items()]
     )
     width = models.PositiveIntegerField(null=True, blank=True)
     height = models.PositiveIntegerField(null=True, blank=True)
@@ -581,7 +574,7 @@ class PhotoSize(object):
 
     def __init__(self, photo, **kwargs):
         self.photo = photo
-        for key, value in six.iteritems(kwargs):
+        for key, value in kwargs.items():
             setattr(self, key, value)
 
         self.secret = getattr(self.photo, self.secret_field)
@@ -659,7 +652,7 @@ class PhotoSize(object):
         return None
 
 
-for key, size in FLICKR_PHOTO_SIZES.items():
+for key, size in list(FLICKR_PHOTO_SIZES.items()):
     label = size.get("label", None)
     setattr(Photo, label, attrproperty(PhotoSize.as_property(size=size)))
     """ Deprecation warning """
@@ -763,7 +756,6 @@ class PhotoSetManager(models.Manager):
         return obj
 
 
-@python_2_unicode_compatible
 class PhotoSet(FlickrModel):
     """http://www.flickr.com/services/api/explore/flickr.photosets.getInfo"""
 
@@ -889,7 +881,6 @@ class CollectionManager(models.Manager):
         return self.create_from_usertree_json(flickr_user, tree, update=True, **kwargs)
 
 
-@python_2_unicode_compatible
 class Collection(FlickrModel):
 
     parent = models.ForeignKey("self", null=True)
@@ -940,15 +931,13 @@ def upload_path(obj, filename):
     )
 
 
-@python_2_unicode_compatible
 class PhotoDownload(models.Model):
 
     photo = models.OneToOneField(Photo)
     url = models.URLField(max_length=255, null=True, blank=True)
     image_file = models.FileField(upload_to=upload_path, null=True, blank=True)
     size = models.CharField(
-        max_length=11,
-        choices=[(v["label"], k) for k, v in six.iteritems(FLICKR_PHOTO_SIZES)],
+        max_length=11, choices=[(v["label"], k) for k, v in FLICKR_PHOTO_SIZES.items()]
     )
     errors = models.TextField(null=True, blank=True)
     date_downloaded = models.DateTimeField(auto_now_add=True)

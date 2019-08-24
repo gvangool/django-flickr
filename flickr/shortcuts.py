@@ -1,10 +1,7 @@
-from __future__ import absolute_import, unicode_literals
-
 import time
 
 from django.conf import settings
 from munch import munchify
-from six.moves import range
 
 from flickr.api import FlickrApi
 from flickr.models import FlickrUser

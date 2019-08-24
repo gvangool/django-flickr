@@ -1,20 +1,17 @@
-from __future__ import absolute_import, unicode_literals
-
 import hashlib
 import json
+import urllib.error
+import urllib.parse
+import urllib.request
+from urllib.error import HTTPError
 from xml.dom import minidom
 
-import six
-import six.moves.urllib.error
-import six.moves.urllib.parse
-import six.moves.urllib.request
 from oauth2 import (
     Consumer as OAuthConsumer,
     Request as OAuthRequest,
     SignatureMethod_HMAC_SHA1,
     Token,
 )
-from six.moves.urllib.error import HTTPError
 
 
 class FlickrError(Exception):
@@ -90,7 +87,7 @@ class OAuthFlickrApi(BaseFlickrApi):
         return request
 
     def get_response(self, request):
-        response = six.moves.urllib.request.urlopen(request.to_url())
+        response = urllib.request.urlopen(request.to_url())
         return "\n".join(line.decode("utf-8") for line in response.readlines())
 
     def _call_method(self, auth, **params):
@@ -170,10 +167,7 @@ class FlickrAuthApi(BaseFlickrApi):
             params["nojsoncallback"] = 1
         if not params.get("method", "").startswith("flickr."):
             params["method"] = "flickr.%s" % params["method"]
-        url = "%s?%s" % (
-            self.ENDPOINT,
-            six.moves.urllib.parse.urlencode(sorted(params.items())),
-        )
+        url = "%s?%s" % (self.ENDPOINT, urllib.parse.urlencode(sorted(params.items())))
         if auth:
             if not self.token:
                 raise FlickrError(
@@ -186,14 +180,12 @@ class FlickrAuthApi(BaseFlickrApi):
                     "%s%s"
                     % (
                         self.FLICKR_SECRET,
-                        "".join(
-                            sorted(["%s%s" % (k, v) for k, v in six.iteritems(params)])
-                        ),
+                        "".join(sorted(["%s%s" % (k, v) for k, v in params.items()])),
                     )
                 ).hexdigest(),
             )
         try:
-            f = six.moves.urllib.request.urlopen(url)
+            f = urllib.request.urlopen(url)
         except Exception as e:
             raise FlickrError(
                 "Can't open url (%s), urllib.urlopen() failed with %s" % (url, e)
@@ -213,7 +205,7 @@ class FlickrAuthApi(BaseFlickrApi):
         )
 
     def _parse_xml(self, url):
-        xml = minidom.parse(six.moves.urllib.request.urlopen(url))
+        xml = minidom.parse(urllib.request.urlopen(url))
         data = unmarshal(xml)
         if not data.rsp.stat == "ok":
             msg = "ERROR [%s]: %s" % (data.rsp.err.code, data.rsp.err.msg)
@@ -261,7 +253,7 @@ class Bag:
 def unmarshal(element):
     rc = Bag()
     if isinstance(element, minidom.Element):
-        for key in element.attributes.keys():
+        for key in list(element.attributes.keys()):
             setattr(rc, key, element.attributes[key].value)
 
     childElements = [e for e in element.childNodes if isinstance(e, minidom.Element)]

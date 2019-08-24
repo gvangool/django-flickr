@@ -11,8 +11,6 @@ References:
  * http://www.flickr.com/services/api/misc.urls.html
 """
 
-from __future__ import unicode_literals
-
 FLICKR_PHOTO_SOURCE = "http://farm%(farm-id)s.staticflickr.com/%(server-id)s/%(photo-id)s_%(secret)s%(size_suffix)s.%(format)s%(append)s"
 FLICKR_PHOTO_URL_PAGE = "http://www.flickr.com/photos/%(user-id)s/%(photo-id)s/"
 FLICKR_PHOTO_URL_PAGE_SIZES = (
@@ -101,7 +99,7 @@ FLICKR_PHOTO_SIZES = {
 
 
 def get_size_from_label(label):
-    for key, size_item in FLICKR_PHOTO_SIZES.items():
+    for key, size_item in list(FLICKR_PHOTO_SIZES.items()):
         if label == size_item.get("label", None):
             return size_item
 
