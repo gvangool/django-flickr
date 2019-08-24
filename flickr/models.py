@@ -38,7 +38,7 @@ class FlickrUserManager(models.Manager):
 
 
 class FlickrUser(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     flickr_id = models.CharField(max_length=50, null=True, blank=True)
     nsid = models.CharField(max_length=32, null=True, blank=True)
     username = models.CharField(max_length=64, null=True, blank=True)
@@ -77,7 +77,7 @@ class FlickrUser(models.Model):
 
 class FlickrModel(models.Model):
     flickr_id = models.CharField(unique=True, db_index=True, max_length=50)
-    user = models.ForeignKey(FlickrUser)
+    user = models.ForeignKey(FlickrUser, on_delete=models.CASCADE)
     show = models.BooleanField(default=True)  # #show the photo on your page?
     last_sync = models.DateTimeField(blank=True, null=True, editable=False)
 
@@ -530,7 +530,7 @@ class PhotoSizeDataManager(models.Manager):
 
 
 class PhotoSizeData(models.Model):
-    photo = models.ForeignKey(Photo, related_name="sizes")
+    photo = models.ForeignKey(Photo, related_name="sizes", on_delete=models.CASCADE)
     size = models.CharField(
         max_length=11, choices=[(v["label"], k) for k, v in FLICKR_PHOTO_SIZES.items()]
     )
@@ -883,7 +883,7 @@ class CollectionManager(models.Manager):
 
 class Collection(FlickrModel):
 
-    parent = models.ForeignKey("self", null=True)
+    parent = models.ForeignKey("self", null=True, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     description = models.TextField(null=True, blank=True)
     icon = models.URLField(max_length=255, null=True, blank=True)
@@ -933,7 +933,7 @@ def upload_path(obj, filename):
 
 class PhotoDownload(models.Model):
 
-    photo = models.OneToOneField(Photo)
+    photo = models.OneToOneField(Photo, on_delete=models.CASCADE)
     url = models.URLField(max_length=255, null=True, blank=True)
     image_file = models.FileField(upload_to=upload_path, null=True, blank=True)
     size = models.CharField(

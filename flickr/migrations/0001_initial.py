@@ -40,7 +40,12 @@ class Migration(migrations.Migration):
                 ("description", models.TextField(null=True, blank=True)),
                 ("icon", models.URLField(max_length=255, null=True, blank=True)),
                 ("date_created", models.DateTimeField(null=True, blank=True)),
-                ("parent", models.ForeignKey(to="flickr.Collection", null=True)),
+                (
+                    "parent",
+                    models.ForeignKey(
+                        to="flickr.Collection", null=True, on_delete=models.CASCADE
+                    ),
+                ),
             ],
             options={"ordering": ("-date_created",), "get_latest_by": "date_created"},
             bases=(models.Model,),
@@ -72,7 +77,12 @@ class Migration(migrations.Migration):
                 ("token", models.CharField(max_length=128, null=True, blank=True)),
                 ("perms", models.CharField(max_length=32, null=True, blank=True)),
                 ("last_sync", models.DateTimeField(null=True, blank=True)),
-                ("user", models.OneToOneField(to=settings.AUTH_USER_MODEL)),
+                (
+                    "user",
+                    models.OneToOneField(
+                        to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE
+                    ),
+                ),
             ],
             options={"ordering": ["id"]},
             bases=(models.Model,),
@@ -188,7 +198,10 @@ class Migration(migrations.Migration):
                         verbose_name="Tags",
                     ),
                 ),
-                ("user", models.ForeignKey(to="flickr.FlickrUser")),
+                (
+                    "user",
+                    models.ForeignKey(to="flickr.FlickrUser", on_delete=models.CASCADE),
+                ),
             ],
             options={
                 "ordering": ("-date_posted", "-date_taken"),
@@ -240,7 +253,10 @@ class Migration(migrations.Migration):
                     "date_downloaded",
                     models.DateTimeField(auto_now=True, auto_now_add=True),
                 ),
-                ("photo", models.OneToOneField(to="flickr.Photo")),
+                (
+                    "photo",
+                    models.OneToOneField(to="flickr.Photo", on_delete=models.CASCADE),
+                ),
             ],
             options={},
             bases=(models.Model,),
@@ -278,7 +294,10 @@ class Migration(migrations.Migration):
                     "photos",
                     models.ManyToManyField(to="flickr.Photo", null=True, blank=True),
                 ),
-                ("user", models.ForeignKey(to="flickr.FlickrUser")),
+                (
+                    "user",
+                    models.ForeignKey(to="flickr.FlickrUser", on_delete=models.CASCADE),
+                ),
             ],
             options={
                 "ordering": ("-date_posted", "-id"),
@@ -322,7 +341,14 @@ class Migration(migrations.Migration):
                 ("height", models.PositiveIntegerField(null=True, blank=True)),
                 ("source", models.URLField(null=True, blank=True)),
                 ("url", models.URLField(null=True, blank=True)),
-                ("photo", models.ForeignKey(related_name="sizes", to="flickr.Photo")),
+                (
+                    "photo",
+                    models.ForeignKey(
+                        related_name="sizes",
+                        to="flickr.Photo",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
             ],
             options={},
             bases=(models.Model,),
@@ -339,7 +365,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="collection",
             name="user",
-            field=models.ForeignKey(to="flickr.FlickrUser"),
+            field=models.ForeignKey(to="flickr.FlickrUser", on_delete=models.CASCADE),
             preserve_default=True,
         ),
     ]
