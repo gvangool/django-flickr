@@ -7,10 +7,10 @@ from datetime import datetime
 
 import django
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client
 from django.test.utils import override_settings
+from django.urls import reverse
 from munch import munchify
 
 from flickr.flickr_spec import FLICKR_PHOTO_SIZES
