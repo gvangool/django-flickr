@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
+from django.utils.html import format_html
 from django.utils.timezone import now
 from munch import munchify  # #for json.dot.notation instead of json['annoying']['dict']
 from taggit.managers import TaggableManager
@@ -688,10 +689,9 @@ for key, size in list(FLICKR_PHOTO_SIZES.items()):
 
 
 def thumb(self):
-    return '<img src="%s"/>' % getattr(self, "square_source")
+    return format_html('<img src="{}"/>', getattr(self, "square_source"))
 
 
-thumb.allow_tags = True
 setattr(Photo, "thumbnail", thumb)
 
 
@@ -801,9 +801,7 @@ class PhotoSet(FlickrModel):
 
     def thumbnail(self):
         if self.cover():
-            return '<img src="%s"/>' % self.cover().square_source
-
-    thumbnail.allow_tags = True
+            return format_html('<img src="{}"/>', self.cover().square_source)
 
 
 class CollectionManager(models.Manager):
@@ -907,9 +905,7 @@ class Collection(FlickrModel):
         )
 
     def thumbnail(self):
-        return '<img src="%s"/>' % self.icon.replace("_l.", "_s.")
-
-    thumbnail.allow_tags = True
+        return format_html('<img src="{}"/>', self.icon.replace("_l.", "_s."))
 
 
 class JsonCache(models.Model):
