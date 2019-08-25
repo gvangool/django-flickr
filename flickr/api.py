@@ -91,7 +91,7 @@ class OAuthFlickrApi(BaseFlickrApi):
 
     def get_response(self, request):
         response = six.moves.urllib.request.urlopen(request.to_url())
-        return "\n".join(response.readlines())
+        return "\n".join(line.decode("utf-8") for line in response.readlines())
 
     def _call_method(self, auth, **params):
         if params.get("format", "json") == "json":
